@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model EmailIngestionConfig {
+  id             Int      @id @default(autoincrement())
+  emailAddress   String
+  connectionType String
+  username       String
+  password       String
+  host           String
+  createdAt      DateTime @default(now())
+
+  pdfs PDFMetadata[] @relation("EmailToPDFs")
+}
+
+model PDFMetadata {
+  id                 Int                  @id @default(autoincrement())
+  fromAddress        String
+  dateReceived       DateTime
+  subject            String
+  attachmentFileName String
+  emailConfigId      Int
+  emailConfig        EmailIngestionConfig @relation("EmailToPDFs", fields: [emailConfigId], references: [id])
+}
